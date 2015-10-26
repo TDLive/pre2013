@@ -1,0 +1,4 @@
+#!/bin/bash
+echo "Removing log file...";
+rm "/var/log/tdlog.txt";
+exit $?

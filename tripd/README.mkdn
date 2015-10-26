@@ -1,0 +1,46 @@
+tripd
+====
+
+A little web server for TDLive/trippingrobot written in PHP. Almost completely based on dhotson/kelpie.
+
+Installation
+----
+
+You'll need the httpparser extension, it's a PHP extension
+for the C http parser from the mongrel web server:
+
+    * http://github.com/dhotson/httpparser-php
+
+Installing tripd:
+
+    sudo apt-get -qy install php5 php5-cli
+    git clone https://github.com/TDLive/tripd.git
+
+Usage
+----
+
+To start the server:
+
+    php tripd.php
+
+Credits
+----
+
+tripd is heavily based on Kelpie, see getkelpie.com. Below are the
+credits for Kelpie:
+
+This little project is inspired by the Thin web server and
+the Rack web server interface.
+
+A lot of the classes are a direct port of Ruby classes in Thin and Rack.
+I can't claim much credit in writing them.
+
+Thanks go to the guys who created Thin and Rack:
+
+  * http://code.macournoyer.com/thin/
+  * http://rack.rubyforge.org/
+
+The http parser is from Mongrel http://mongrel.rubyforge.org by Zed Shaw.
+Mongrel Web Server (Mongrel) is copyrighted free software by Zed A. Shaw
+<zedshaw at zedshaw dot com> You can redistribute it and/or modify it under
+either the terms of the GPL.

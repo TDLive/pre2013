@@ -1,0 +1,15 @@
+name: TDLive BukkitPlugin
+main: org.tdlive.bukkit.plugin.Plugin
+version: 1.2.2
+description: Pure aw'sumness.
+commands:
+   lol:
+      description: Have the server agree with you about a LOL.
+      usage: /lol
+      permission: tbkt.util.lol
+      permission-message: You don't have permission for the server to LOL *cough*at*cough* with you.
+   burp:
+      description: (belches) Well that was a nice lunch.
+      usage: /s_explosion
+      permission: tbkt.s.burp
+      permission-message: You can't burp.

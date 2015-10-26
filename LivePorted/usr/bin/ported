@@ -1,0 +1,59 @@
+#!/bin/bash
+ver="0.1 beta"
+echo "ThunderDrive LivePorted $ver";
+echo "(c)2011 TDLive. Licensed under the GNU GPL v3 (source code is available at http://github.com/TDLive).";
+if [ "$1" = "install" ]; then
+	if [ -z "$2" ]; then
+		echo "No package specified!";
+		exit 1;
+	fi
+	if [ ! $(pwd) == "/usr/bin" ]; then
+	cd lib/porteddb
+	else
+	cd ../lib/porteddb;
+	fi
+	found=$(grep -lir "$2" *);
+	if [ -z "$found" ]; then
+		echo "No package by that name found.";
+	elif [ "$found" == "binary.db" ]; then
+		echo "Need to download the package $2 in binary form.";
+	fi
+elif [ "$1" = "remove" ]; then
+echo "NOT YET IMPLEMENTED!";
+elif [ "$1" = "source" ]; then
+echo "NOT YET IMPLEMENTED!";
+elif [ "$1" = "sh" ]; then
+echo "NOT YET IMPLEMENTED!";
+elif [ "$1" = "todo" ]; then
+echo
+echo "Todo:"
+echo "-Make install work"
+echo "-Make remove work"
+echo "-Make source work"
+echo "-Make sh work";
+elif [ -z "$1" ]; then
+echo "No command specified.";
+echo
+echo "Synopsis: $0 [install | remove | source | sh] PACKAGE";
+echo
+echo "install: Install a program.";
+echo "remove: Remove a program that LivePorted has installed.";
+echo "source: Download a source package.";
+echo "sh: Open up a shell to run LivePorted commands.";
+echo
+echo "PACKAGE: The package you wish to install. Not required for the sh command.";
+exit 1;
+else
+echo "Synopsis: $0 [install | remove | source | sh] PACKAGE";
+echo
+echo "install: Install a program.";
+echo "remove: Remove a program that LivePorted has installed.";
+echo "source: Download a source package.";
+echo "sh: Open up a shell to run LivePorted commands.";
+echo
+echo "PACKAGE: The package you wish to install. Not required for the sh command.";
+echo
+echo "$1 not found; exiting.";
+exit 1;
+fi
+exit $?;

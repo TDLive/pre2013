@@ -1,0 +1,13 @@
+Package: apt-gtk
+Version: 4beta
+Priority: optional
+Section: system
+Maintainer: ThunderDrive Incorporated East Networks Sunshine Valley <DoNotEmail@me.com>
+Essential: no
+Architecture: all
+Suggests: aptitude
+Pre-Depends: zenity, ubuntu-desktop
+Depends: apt, dpkg, debconf, alien
+Installed-Size: 11264
+Description: A graphical frontend for APT
+ A fully graphical frontend for APT including options that allow installation of packages, conversion of packages, updating of the system, and more. The command also accepts arguments that allow unattended installation.

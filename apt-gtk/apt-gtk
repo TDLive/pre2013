@@ -1,0 +1,218 @@
+#!/bin/bash
+#TDLive apt-gtk
+#Copyright 2011-2013 TDLive.org Incorporated.
+#Licensed under the GNU GPL.
+ver="beta4";
+log="/var/log/aptgtk.txt"
+date=$(date);
+echo "
+Initializing..." >> "$log";
+if [ ! -e "$log" ]; then
+	touch "$log";
+fi
+echo "Resetting user timestamp to avoid gksudo problems..." >> "$log";
+sudo -k
+# Select the time of day
+echo "tdlive aw'sum's apt-gtk $ver ($(date))" >> "$log"
+echo "Checking $1 for possible options..." >> "$log";
+if [ "$1" = "upgrade" ]; then
+	Answer="Update the system";
+elif [ "$1" = "install" ]; then
+	Answer="Install a package";
+elif [ "$1" = "install-deb" ]; then
+	Answer="Install a .deb package"
+elif [ "$1" = "cvrpm" ];then
+	Answer="Convert a .rpm package";
+elif [ "$1" = "remove" ]; then
+	Answer="Remove and purge a package";
+elif [ "$1" = "autoremove" ]; then
+	Answer="Remove unused packages";
+elif [ "$1" = "clean" ]; then
+	Answer="Remove downloaded package files";
+elif [ "$1" = "help" ]; then
+	echo "A BASH shell script graphical frontend for APT that uses zenity"
+	echo "Copyright 2011-2013 tdlive aw'sum."
+	echo "Licensed under the GNU GPL v3 or later.";
+	echo "Source: http://github.com/TDLive/apt-gtk."
+	echo
+	echo "SYNOPSIS: apt-gtk [upgrade | install | install-deb | cvrpm | remove | autoremove | clean | show-logs | install-alien | help] (package)";
+	echo
+	echo "upgrade: Upgrades the system.";
+	echo "install: Installs a package through a GTK+ input window.";
+	echo "install-deb: Installs a .deb package. !USE AT YOUR OWN RISK!";
+	echo "cvrpm: Converts a .rpm package to a .deb package. You must have the alien package installed on your computer to do so. To install the package type in apt-gtk install-alien. !USE AT YOUR OWN RISK!";
+	echo "remove: Checks the package with the blacklist and then removes it.";
+	echo "autoremove: Removes packages that are not in use by another package.";
+	echo "clean: Cleans up by removing temporary packages.";
+	echo 
+	echo "(package): if applicable";
+	echo
+	echo "apt-gtk also produces a log file containing useful information. It is stored in $log. You can run the command apt-gtk show-logs or gedit $log to view the file.";
+	exit 0
+elif [ "$1" = "show-logs" ]; then
+	gedit "$log";
+	exit 0
+elif [ "$1" = "install-alien" ]; then
+	gksudo --message="To install the alien package, you need an administrator's password." "apt-get install alien -q -y" >> "$log";
+	zenity --info --title="tdlive aw'sum's apt-gtk" --text="Completed.";
+	exit 0
+elif [ -n "$1" ]; then
+	echo "Error: $1 is an invalid answer.";
+	echo
+	echo "SYNOPSIS: apt-gtk [upgrade | install | install-deb | cvrpm | remove | autoremove | clean | show-logs | install-alien]";
+	echo
+	echo "For a full list of options (and what they do) type $0 help.";
+	echo
+	echo "The option selection screen is now coming.";
+	Answer=
+fi
+if [ -z "$1" ]; then
+	Answer=
+fi
+if [ -z "$Answer" ]; then
+	echo "Initalizing zenity..." >> "$log";
+	Answer=$(zenity --list --title="tdlive aw'sum's apt-gtk" --text="Please select an option." --radiolist \
+	 --column="Select" --column="Option" FALSE "Update the system" FALSE "Install a package" FALSE "Install a .deb package" FALSE "Convert a .rpm package" FALSE "Remove and purge a package" FALSE "Remove unused packages" FALSE "Remove downloaded package files" FALSE "Cancel")
+fi
+echo "Checking user answer..." >> "$log";
+if [ "$Answer" = "Update the system" ]; then
+	echo "User answered Update the system." >> "$log";
+	echo "Prompting the user with the GKSUDO dialog and then updating the system..." >> "$log";
+	gksudo --message="To upgrade your system, you need an administrator's password." "apt-get upgrade -q -y" >> "$log";
+	echo "The update completed with status $?." >> "$log";
+	if [ ! $? -eq 0 ]; then
+		zenity --error --title="tdlive aw'sum's apt-gtk" --text="An error occured. The '$Answer' operation completed with error $?.";
+	elif [ $? -eq 0 ]; then
+		echo "Completed." >> "$log";
+	fi
+	zenity --info --title="tdlive aw'sum's apt-gtk" --text="Completed.";
+elif [ "$Answer" = "Install a package" ]; then
+	echo "User answered Install a package." >> "$log";
+	echo "Checking if user specified a package..." >> "$log";
+	if [ -z "$2" ]; then
+		echo "Asking user for what package to install..." >> "$log";
+		PKG=`zenity --title="tdlive aw'sum's apt-gtk" --text='Which package should I install?' --entry`
+		if [ -z "$PKG" ];then
+			zenity --error --title="tdlive aw'sum's apt-gtk" --text="Hey! You didn't specify a package!";
+		exit 1
+	fi
+	else
+		PKG=$2
+	fi
+	echo "Preparing to install $PKG." >> "$log";
+	echo "Prompting the user with the GKSUDO dialog and then installing the package..." >> "$log";
+	gksudo --message="To install a package, you need an administrator's password." "apt-get install $PKG -q -y" >> "$log";
+	echo "The install completed with status $?." >> "$log";
+	echo "Completed." >> "$log";
+	zenity --info --title="tdlive aw'sum's apt-gtk" --text="Completed.";
+elif [ "$Answer" = "Remove and purge a package" ]; then
+	echo "User answered Remove and purge a package." >> "$log";
+if [ -z "$2" ]; then
+	echo "Asking user for what package to remove and purge..." >> "$log";
+	PKG=`zenity --title="tdlive aw'sum's apt-gtk" --text='Which package should I remove and purge?' --entry`
+	if [ -z "$PKG" ];then
+		zenity --error --title="tdlive aw'sum's apt-gtk" --text="Hey! You didn't specify a package!";
+		exit 1
+	fi
+	else
+		PKG=$2
+	fi
+	echo "Preparing to remove and purge $PKG." >> "$log";
+	echo "Checking if the package is on the blacklist..." >> "$log";
+	if [ "$PKG" = "glibc" ]; then
+		echo "User entered package $PKG, which is required by the system. So I'm not removing it." >> "$log";
+		zenity --error --text="$PKG is a required package. It's required by Ubuntu to run. So, I will not remove this package." --title="You're doing something stupid!";
+		exit 1
+	fi
+	if [ "$PKG" = "apt" ]; then
+		echo "User entered package $PKG, which is required by the system. So I'm not removing it." >> "$log";
+		zenity --error --text="$PKG is a required package that's required by Ubuntu to run. So, I will not remove this package." --title="You're doing something stupid!";
+		exit 1
+	fi
+	if [ "$PKG" = "vim" ]; then
+		zenity --error --text="$PKG is a required package that's required by Ubuntu to run. So, I will not remove this package." --title="You're doing something stupid!";
+		exit 1
+	fi
+	if [ "$PKG" = "cat" ]; then
+		echo "User entered package $PKG, which is required by the system. So I'm not removing it." >> "$log";
+		zenity --error --text="$PKG is a required package that's required by Ubuntu to run. So, I will not remove this package." --title="You're doing something stupid!";
+		exit 1
+	fi
+	if [ "$PKG" = "coreutils" ]; then
+		echo "User entered package $PKG, which is required by the system. So I'm not removing it." >> "$log";
+		zenity --error --text="$PKG is a required package that's required by Ubuntu to run. So, I will not remove this package." --title="You're doing something stupid!";
+		exit 1
+	fi
+	if [ "$PKG" = "nautilus" ]; then
+		echo "User entered package $PKG, which is required by the system. So I'm not removing it." >> "$log";
+		zenity --error --text="$PKG is a required package that's required by Ubuntu to run. So, I will not remove this package." --title="You're doing something stupid!";
+		exit 1
+	fi
+	if [ "$PKG" = "unity" ]; then
+		echo "User entered package $PKG, which is required by the system. So I'm not removing it." >> "$log";
+		zenity --error --text="$PKG is a required package that's required by Ubuntu to run. So, I will not remove this package." --title="You're doing something stupid!";
+		exit 1
+	fi
+	if [ "$PKG" = "ubuntu-desktop" ]; then
+		echo "User entered package $PKG, which is required by the system. So I'm not removing it." >> "$log";
+		zenity --error --text="$PKG is a required package that's required by Ubuntu to run. So, I will not remove this package." --title="You're doing something stupid!";
+		exit 1
+	fi
+	echo "Prompting the user with the GKSUDO dialog and then removing the package..." >> "$log";
+	gksudo --message="To remove a package, you need an administrator's password." "apt-get purge $PKG -q -y" >> "$log";
+	echo "The removal and purging completed with status $?." >> "$log";
+	echo "Completed." >> "$log";
+	zenity --info --title="tdlive aw'sum's apt-gtk" --text="Completed.";
+elif [ "$Answer" = "Remove unused packages" ]; then
+	echo "User answered Remove unused packages." >> "$log";
+	echo "Prompting the user with the GKSUDO dialog and then removing unused packages..." >> "$log";
+	gksudo --message="To upgrade your system, you need an administrator's password." "apt-get autoremove -q -y" >> "$log";
+	echo "The removal completed with status $?." >> "$log";
+	echo "Completed." >> "$log";
+	zenity --info --title="tdlive aw'sum's apt-gtk" --text="Completed.";
+elif [ "$Answer" = "Start Synaptic Package Manager" ]; then
+	echo "User answered Start Synaptic Package Manager." >> "$log";
+	gksudo --message="To start Synaptic properly, you must provide an administrator password." synaptic;
+	exit $?
+elif [ "$Answer" = "Install a .deb package" ]; then
+	echo "User answered Install a .deb package." >> "$log";
+	echo "Asking user for what package to install..." >> "$log";
+	szSavePath=$(zenity --file-selection --title="tdlive aw'sum's apt-gtk" --text="Select a .deb package")
+	if [ -z "$szSavePath" ];then
+		zenity --error --title="tdlive aw'sum's apt-gtk" --text="Hey! You didn't specify a .deb file!";
+	exit 1
+	fi
+	echo "Preparing to install $szSavePath." >> "$log";
+	echo "Prompting the user with the GKSUDO dialog and then installing the package..." >> "$log";
+	gksudo --message="To install a package, you need an administrator's password." "dpkg -i $szSavePath" >> "$log";
+	echo "The install completed with status $?." >> "$log";
+	echo "Completed." >> "$log";
+	zenity --info --title="tdlive aw'sum's apt-gtk" --text="Completed.";
+	exit 0
+elif [ "$Answer" = "Convert a .rpm package" ]; then
+	echo "User answered Convert a .rpm package." >> "$log";
+	echo "Asking user for what package to install..." >> "$log";
+	szSavePath=$(zenity --file-selection --title="TDLive apt-gtk" --text="Select a .rpm package")
+	if [ -z "$szSavePath" ];then
+		zenity --error --title="tdlive aw'sum's apt-gtk" --text="Hey! You didn't specify a .rpm file!";
+		exit 1
+	fi
+	echo "Preparing to convert $szSavePath." >> "$log";
+	echo "Prompting the user with the GKSUDO dialog and then converting the package..." >> "$log";
+	gksudo --message="To convert a .rpm package, you need an administrator's password." "alien $szSavePath" >> "$log";
+	echo "The convert completed with status $?." >> "$log";
+	echo "Completed converting." >> "$log";
+	echo "The file is named $szSavePath but .deb as the file extension. You can use the Install a .deb package option to install it." >> "$log";
+	zenity --info --title="tdlive aw'sum's apt-gtk" --text="Completed. The file is named $szSavePath but .deb as the file extension. You can use the Install a .deb package option to install it.";
+	exit 0
+elif [ "$Answer" = "Remove downloaded package files" ];then
+	echo "User answered Remove downloaded package files." >> "$log";
+	echo "Prompting the user with the GKSUDO dialog and then removing the package files..." >> "$log";
+	gksudo --message="To remove unused package files, you need an administrator's password." "apt-get clean -q -y" >> "$log";
+	echo "The removal completed with status $?." >> "$log";
+	echo "Completed." >> "$log";
+	zenity --info --text="Completed." --title="tdlive aw'sum's apt-gtk";
+elif [ "$Answer" = "Cancel" ]; then
+	echo "Operation canceled." >> "$log";
+	exit 0
+fi

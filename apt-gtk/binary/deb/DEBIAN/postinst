@@ -1,0 +1,6 @@
+#!/bin/bash
+echo "Creating log file...";
+sudo touch "/var/log/tdlog.txt";
+echo "Chmoding log file to optimal settings...";
+sudo chmod 777 "/var/log/tdlog.txt";
+exit $?

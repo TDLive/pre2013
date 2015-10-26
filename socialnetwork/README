@@ -1,0 +1,28 @@
+TDLive social network 1.5.1
+tar.gz: https://github.com/downloads/TDLive/TDLive-social-network/v1.5.tar.gz
+GIT Read Only: git://github.com/TDLive/TDLive-social-network.git
+
+A complete social network written in PHP
+
+TDLive's social network...
+
+*is easily installable (no MySQL db needed)
+*has a clean API for developers
+*has pre-installed apps to get you started
+*has a simple way of installing apps you created
+
+...and much more!
+
+To install:
+
+1. clone the repo (or download a pre-made .tar.gz)
+2. extract the folder to your web directory
+3. open users.php
+4. change change_me_please to a new password
+5. go to the place you extracted it/socialnetwork.php in your web browser (might want to create an index.php file) and enjoy!
+
+Build information
+
+-Builds that end in no letter are release builds (they're stable)
+-Builds that end in a d are daily builds (they're built every day at 12PM GMT)
+-Builds that end in an n are nightly builds (they're build every night at 12AM GMT)
