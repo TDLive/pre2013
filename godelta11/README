@@ -1,0 +1,12 @@
+TDLive Go Delta 11 <BETA>
+=========================
+
+(c)2010-2012 TDLive Development, Inc. Licensed under the GNU GPL v3 or later.
+Source is available at <https://github.com/TDLive/Go-Delta/>.
+
+Go Delta 11 is yet another CMS (content managment system) for small schools or classes. 
+
+WARNING: Go Delta 11 is beta software, and should be treated as such. In other words,
+DON'T USE ON A PRODUCTION SERVER!
+
+Install instructions are in api.php.
